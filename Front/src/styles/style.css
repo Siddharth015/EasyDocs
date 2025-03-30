@@ -1,0 +1,175 @@
+/* Importing Tailwind */
+@import "tailwindcss";
+
+/* Root Variables */
+:root {
+  --primary-blue: #1e3a8a;
+  --light-blue: #3b82f6;
+  --background: #ffffff;
+  --text-dark: #1f2937;
+  --gradient: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+}
+
+/* General Body Styling */
+body {
+  background-color: var(--background);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Modern Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.header {
+  padding-inline:30%;
+  margin-top: 20px;
+  margin-bottom: 100px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeIn 1s ease-in-out, pulse 3s infinite;
+}
+
+.header p {
+  font-size: 1.2rem;
+  margin-top: 10px;
+  animation: slideUp 1.5s ease-in-out;
+}
+
+/* Input Container */
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+}
+
+.input-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-field {
+  border: 2px solid var(--primary-blue);
+  padding: 12px;
+  width: 400px;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.generate-button {
+  background: var(--gradient);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.generate-button:hover {
+  background: var(--light-blue);
+  transform: scale(1.05);
+}
+
+/* Steps Container */
+.steps-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.step-box {
+  background: var(--gradient);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  height: 200p;
+  text-align: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.step-box:hover {
+  transform: scale(1.05);
+  background: var(--light-blue);
+}
+
+/* Results */
+.results-container {
+  margin-top: 40px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width: 60%;
+  max-width: 600px;
+  animation: slideUp 1s ease-in-out;
+}
+
+
+
+/* Footer */
+footer {
+ 
+  color: black;
+  text-align: center;
+  padding: 10px;
+  margin-top: 50%;
+  width: 100%;
+}
