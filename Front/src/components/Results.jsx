@@ -1,13 +1,19 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
+import DocGenerator from "../components/DocGenerator";
 
-const Results = ({ repoUrl }) => {
+const ResultsPage = () => {
+  const location = useLocation();
+  const documentation = location.state?.documentation || [];
+
   return (
-    <div className="results-container">
-      <h2>Documentation for:</h2>
-      <p>{repoUrl}</p>
-      {/* AI-generated documentation output will be displayed here */}
+    <div className="results-page">
+     
+      <div className="scroll-container"> {/* Added scroll wrapper */}
+        <DocGenerator documentation={documentation} />
+      </div>
     </div>
   );
 };
 
-export default Results;
+export default ResultsPage;
