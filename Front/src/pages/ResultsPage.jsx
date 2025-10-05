@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 
 const ResultsPage = () => {
   const location = useLocation();
-  // This safely gets the documentation array passed from the previous page
   const documentationFiles = location.state?.documentation || [];
   const [copiedStates, setCopiedStates] = useState({});
 
