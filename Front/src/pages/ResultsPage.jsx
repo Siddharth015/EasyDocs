@@ -54,10 +54,12 @@ const ResultsPage = () => {
                       )}
                     </button>
                   </div>
-                  <div className="p-4 max-h-96 overflow-y-auto">
-                    <pre className="whitespace-pre-wrap text-[--text-secondary] text-sm font-mono">
-                      {file.documentation}
-                    </pre>
+                  <div className="p-6 max-h-[40rem] overflow-y-auto">
+                    <div className="prose prose-invert max-w-none text-left">
+                      <ReactMarkdown remarkPlugins={[remarkMermaid]}>
+                        {file.documentation}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))}
