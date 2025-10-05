@@ -36,15 +36,15 @@
 
 ### Frontend Setup (React+Vite)
 ```bash
-cd frontend
+cd Front
 npm install
-npm start
+npm run dev
 ```
 
 Backend Setup (Spring Boot)
 
 ```bash
-cd backend
-./mvnw spring-boot:run
+cd Back
+mvn spring-boot:run
 # or use Gradle:
 # ./gradlew bootRun
