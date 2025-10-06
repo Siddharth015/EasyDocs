@@ -1,9 +1,12 @@
-# Use the official Maven image with Java 21 for building the app
+# ---- Build Stage ----
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn package -DskipTests
 
-# Use a lightweight OpenJDK 21 image for running the app
+# ---- Runtime Stage ----
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
