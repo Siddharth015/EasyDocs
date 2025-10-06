@@ -15,7 +15,7 @@ const InputField = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/generate-documentation", {
+      const response = await fetch("https://easydocs-m9xz.onrender.com/api/generate-documentation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repo_url: code }),
