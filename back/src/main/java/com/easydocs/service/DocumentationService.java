@@ -15,32 +15,31 @@ public class DocumentationService {
         this.geminiService = geminiService;
     }
 
-    public String generateProjectDocumentation(String repoUrl, String githubToken) {
-        // Fetch all files recursively from GitHub
-        List<Map<String, String>> files = gitHubService.getRepositoryFiles(repoUrl, githubToken);
+    public String generateProjectDocumentation(String repoUrl) {
+        List<Map<String, String>> files = gitHubService.getRepositoryFiles(repoUrl);
 
-        // Extract README content (if available)
+        // Extract README content 
         String readmeContent = files.stream()
             .filter(file -> file.get("name").equalsIgnoreCase("README.md"))
             .findFirst()
-            .map(readme -> gitHubService.fetchFileContent(readme.get("url"), githubToken))
+            .map(readme -> gitHubService.fetchFileContent(readme.get("url")))
             .orElse("No README found.");
 
-        // Extract other code files (skip README)
+        // Extract other code files
         List<FileData> fileContents = files.stream()
             .filter(file -> !file.get("name").equalsIgnoreCase("README.md"))
             .map(file -> new FileData(
                 file.get("name"),
                 file.get("url"),
-                gitHubService.fetchFileContent(file.get("url"), githubToken)
+                gitHubService.fetchFileContent(file.get("url"))
             ))
             .collect(Collectors.toList());
 
         // Detect predominant tech stack based on file extensions
         String techStack = detectTechStack(fileContents);
 
-        // Generate documentation using Gemini AI with tech stack info
-        String documentation = geminiService.generateProjectDocumentation(readmeContent, fileContents, techStack, githubToken);
+        // Generate documentation using Gemini AI 
+        String documentation = geminiService.generateProjectDocumentation(readmeContent, fileContents, techStack);
 
         return documentation;
     }

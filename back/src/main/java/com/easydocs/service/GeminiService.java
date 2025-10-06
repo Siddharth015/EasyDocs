@@ -19,9 +19,9 @@ public class GeminiService {
     private String geminiApiKey;
 
     // Using a more recent and powerful model
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent";
 
-    public String generateProjectDocumentation(String readme, List<FileData> files, String techStack, String githubToken) {
+    public String generateProjectDocumentation(String readme, List<FileData> files, String techStack) {
         if (geminiApiKey == null || geminiApiKey.isEmpty()) {
             throw new RuntimeException("Gemini API Key is missing. Check application-secret.properties");
         }
@@ -60,12 +60,11 @@ public class GeminiService {
         prompt.append("## INSTRUCTIONS:\n");
         prompt.append("1.  *Project Overview:* Start with a concise, high-level summary of the project's purpose.\n");
         
-        // --- NEW INSTRUCTION FOR ARCHITECTURE DIAGRAM ---
-        prompt.append("2.  *Architecture Diagram:* Create a high-level architecture diagram using Mermaid.js syntax. The diagram should show the main components (e.g., Frontend, Backend, APIs, Databases) and their interactions. Enclose the diagram in a mermaid code fence.\n");
+        // --- INSTRUCTION FOR ARCHITECTURE DIAGRAM ---
+        prompt.append("2.  *Architecture Diagram:* Create a simple, high-level architecture diagram using basic Mermaid.js flowchart syntax (e.g., graph TD; A-->B;). Do not use any advanced styling commands like 'style' or 'classDef'. The diagram should show the main components and their connections. Enclose it in a mermaid code fence.\n");
         
         prompt.append("3.  **Module Breakdown:** Provide detailed explanations for each important file and module.\n");
         
-        // --- NEW CONDITIONAL LOGIC FOR INSTALLATION STEPS ---
         boolean hasPackageJson = files.stream().anyMatch(file -> "package.json".equalsIgnoreCase(file.getName()));
         if (hasPackageJson) {
             prompt.append("4.  **Getting Started:** A `package.json` was found. Based on its contents, generate a 'Getting Started' section with installation (`npm install`) and running (`npm run dev`) instructions.\n");
@@ -90,17 +89,22 @@ public class GeminiService {
     
     private String extractGeneratedContent(String jsonResponse) {
         try {
+            StringBuilder fullText = new StringBuilder(); // Use a StringBuilder to join the parts
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             System.out.println("Gemini API Response: " + rootNode.toPrettyString());
-            // This structure is safer and checks for the existence of nodes
+
             JsonNode candidates = rootNode.path("candidates");
             if (candidates.isArray() && !candidates.isEmpty()) {
                 JsonNode parts = candidates.get(0).path("content").path("parts");
                 if (parts.isArray() && !parts.isEmpty()) {
-                    return parts.get(0).path("text").asText("No documentation generated.");
+                    // Loop through ALL parts and append their text
+                    for (JsonNode part : parts) {
+                        fullText.append(part.path("text").asText(""));
+                    }
+                    return fullText.toString();
                 }
             }
-            // Add a fallback for rate limiting or other errors
+            
             JsonNode error = rootNode.path("error");
             if (!error.isMissingNode()) {
                  return "Error from Gemini API: " + error.path("message").asText("Unknown error.");

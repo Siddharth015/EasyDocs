@@ -17,23 +17,18 @@ public class DocumentationController {
     }
 
     @PostMapping("/generate-documentation")
-    public ResponseEntity<?> generateDocs(
-        @RequestBody Map<String, String> request,
-        @RequestHeader(value = "Authorization", required = false) String token
-    ) {
+    public ResponseEntity<?> generateDocs(@RequestBody Map<String, String> request) {
         try {
             String repoUrl = validateRequest(request);
-            String cleanToken = processToken(token);
             
-            String documentation = documentationService.generateProjectDocumentation(repoUrl, cleanToken);
-           
-
+            String documentation = documentationService.generateProjectDocumentation(repoUrl);
+            
             return ResponseEntity.ok(Map.of("documentation", documentation));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                .body(Map.of("error", "Documentation generation failed: " + e.getMessage()));
+                    return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Documentation generation failed: " + e.getMessage()));
         }
     }
 
@@ -42,11 +37,6 @@ public class DocumentationController {
         if (repoUrl == null || !repoUrl.startsWith("https://github.com/")) {
             throw new IllegalArgumentException("Valid GitHub URL required");
         }
-        
         return repoUrl;
-    }
-
-    private String processToken(String token) {
-        return token != null ? token.replace("Bearer ", "") : null;
     }
 }

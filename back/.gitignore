@@ -34,3 +34,6 @@ build/
 
 # Environment variables
 .env
+
+# Ignore the secret properties file
+application-secret.properties

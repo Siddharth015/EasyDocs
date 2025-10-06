@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,10 @@ public class GitHubService {
         ".java", ".py", ".js", ".ts", ".cpp", ".html", ".css", ".md"
     );
 
-    public List<Map<String, String>> getRepositoryFiles(String repoUrl, String githubToken) {
+    @Value("${github.api.token}")
+    private String githubApiToken;
+
+    public List<Map<String, String>> getRepositoryFiles(String repoUrl) {
         if (!repoUrl.startsWith("https://github.com/")) {
             throw new IllegalArgumentException("Invalid GitHub URL. Must start with: https://github.com/");
         }
@@ -38,18 +42,14 @@ public class GitHubService {
         // Start with the root contents API URL
         String apiUrl = String.format("%s%s/%s/contents", GITHUB_API_BASE, owner, repo);
         List<Map<String, String>> files = new ArrayList<>();
-        fetchFilesRecursively(apiUrl, githubToken, files);
+        fetchFilesRecursively(apiUrl, files);
         return files;
     }
 
-    private void fetchFilesRecursively(String apiUrl, String githubToken, List<Map<String, String>> files) {
-        HttpHeaders headers = new HttpHeaders();
+    private void fetchFilesRecursively(String apiUrl, List<Map<String, String>> files) {
+        HttpHeaders headers = createGitHubHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.set("User-Agent", "EasyDocs");
-        if (githubToken != null && !githubToken.isEmpty()) {
-            headers.set("Authorization", "token " + githubToken);
-        }
-
         try {
             ResponseEntity<String> response = restTemplate.exchange(
                 apiUrl, 
@@ -78,7 +78,7 @@ public class GitHubService {
                     } else if ("dir".equals(type)) {
                         // Recurse into directories
                         String dirUrl = node.get("url").asText();
-                        fetchFilesRecursively(dirUrl, githubToken, files);
+                        fetchFilesRecursively(dirUrl, files);
                     }
                 }
             }
@@ -93,14 +93,11 @@ public class GitHubService {
         return SUPPORTED_EXTENSIONS.stream().anyMatch(fileName::endsWith);
     }
 
-    public String fetchFileContent(String fileUrl, String githubToken) {
+    public String fetchFileContent(String fileUrl) {
         try {
-            HttpHeaders headers = new HttpHeaders();
+            HttpHeaders headers = createGitHubHeaders();
             headers.setAccept(List.of(MediaType.TEXT_PLAIN));
             headers.set("User-Agent", "EasyDocs");
-            if (githubToken != null && !githubToken.isEmpty()) {
-                headers.set("Authorization", "token " + githubToken);
-            }
             ResponseEntity<String> response = restTemplate.exchange(
                 fileUrl, 
                 HttpMethod.GET, 
@@ -111,5 +108,14 @@ public class GitHubService {
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Failed to fetch file: " + e.getStatusCode());
         }
+    }
+     private HttpHeaders createGitHubHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.set("User-Agent", "EasyDocs");
+        if (githubApiToken != null && !githubApiToken.isEmpty()) {
+            headers.set("Authorization", "Bearer " + githubApiToken);
+        }
+        return headers;
     }
 }
