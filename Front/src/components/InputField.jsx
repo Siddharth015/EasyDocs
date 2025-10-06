@@ -21,12 +21,13 @@ const InputField = () => {
         body: JSON.stringify({ repo_url: code }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate documentation.");
-      }
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.error || "Failed to generate documentation.");
+      // }
 
       const data = await response.json();
+      console.log("Response data:", data);
       if (data.files) {
         navigate("/results", { state: { documentation: data.files } });
       } else if (data.documentation) {
